@@ -1,0 +1,21 @@
+.schedules-page { display: flex; flex-direction: column; gap: var(--space-6); }
+.schedules-page__header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); }
+.schedules-page__title { font-size: var(--font-4xl); font-weight: 900; letter-spacing: 0.02em; }
+.schedules-selector { max-width: 400px; }
+
+.slot-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-4); align-items: flex-end; }
+
+.slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-4); }
+
+.slot-card { transition: all var(--transition-base); animation: fadeInUp 0.4s ease backwards; }
+.slot-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+.slot-card--booked { opacity: 0.6; }
+
+.slot-card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); }
+.slot-card__date { font-size: var(--font-sm); font-weight: 600; color: var(--text-secondary); }
+.slot-card__time { font-size: var(--font-xl); font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-4); }
+.slot-card__footer { display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-3); border-top: 1px solid var(--border-primary); }
+.slot-card__price { font-size: var(--font-lg); font-weight: 700; color: var(--accent-primary); }
+
+.arena-form { display: flex; flex-direction: column; gap: var(--space-5); }
+.arena-form__sports { display: flex; flex-wrap: wrap; gap: var(--space-2); }

@@ -1,0 +1,25 @@
+.layout {
+  min-height: 100vh;
+}
+
+.layout__main {
+  margin-left: var(--sidebar-width);
+  padding-top: var(--topbar-height);
+  min-height: 100vh;
+}
+
+.layout__content {
+  padding: var(--space-8);
+  max-width: 1400px;
+  animation: fadeInUp 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .layout__main {
+    margin-left: 0;
+  }
+
+  .layout__content {
+    padding: var(--space-4);
+  }
+}

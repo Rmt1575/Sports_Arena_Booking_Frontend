@@ -1,0 +1,13 @@
+.settings-page { display: flex; flex-direction: column; gap: var(--space-6); max-width: 700px; }
+.settings-page__title { font-size: var(--font-4xl); font-weight: 900; letter-spacing: 0.02em; }
+
+.settings-section__header { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+.settings-section__header h3 { font-weight: 700; }
+.settings-section__icon { font-size: 1.5rem; color: var(--accent-primary); flex-shrink: 0; }
+.settings-section--danger { border-color: rgba(239, 68, 68, 0.2); }
+.settings-section--danger .settings-section__icon { color: var(--color-error); }
+
+.settings-form { display: flex; flex-direction: column; gap: var(--space-5); max-width: 400px; }
+
+.settings-danger-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.settings-danger-actions h4 { font-weight: 600; margin-bottom: var(--space-1); }

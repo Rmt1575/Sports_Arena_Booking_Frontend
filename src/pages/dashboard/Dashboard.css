@@ -1,0 +1,641 @@
+/* ── Dashboard ── */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Header */
+.dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.dashboard__title {
+  font-size: var(--font-4xl);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+.dashboard__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: var(--space-2);
+}
+
+.dashboard__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse-glow 2s ease infinite;
+  box-shadow: 0 0 6px var(--color-success);
+}
+
+.dashboard__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Stats Grid */
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+}
+
+/* Content Grid */
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--space-5);
+}
+
+/* Section title */
+.dashboard__section-title {
+  font-size: var(--font-base);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Chart */
+.dashboard__chart {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard__chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+}
+
+.dashboard__chart-tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-primary);
+}
+
+.dashboard__chart-tab {
+  padding: 0.375rem 1rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dashboard__chart-tab--active {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.dashboard__chart-body {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  min-height: 200px;
+}
+
+.chart-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chart-bar-wrapper {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 42px;
+  background: linear-gradient(180deg, #2a3550 0%, #1a2540 100%);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: barGrow 0.8s ease backwards;
+}
+
+.chart-bar--highlight {
+  background: linear-gradient(180deg, var(--accent-primary) 0%, #d4551f 100%);
+  box-shadow: 0 0 15px rgba(232, 97, 45, 0.3);
+}
+
+.chart-bar-label {
+  position: absolute;
+  top: -8px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  transform: translateY(-100%);
+}
+
+.chart-bar-day {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+@keyframes barGrow {
+  from {
+    height: 0% !important;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-bar-group:nth-child(1) .chart-bar {
+  animation-delay: 0.05s;
+}
+.chart-bar-group:nth-child(2) .chart-bar {
+  animation-delay: 0.1s;
+}
+.chart-bar-group:nth-child(3) .chart-bar {
+  animation-delay: 0.15s;
+}
+.chart-bar-group:nth-child(4) .chart-bar {
+  animation-delay: 0.2s;
+}
+.chart-bar-group:nth-child(5) .chart-bar {
+  animation-delay: 0.25s;
+}
+.chart-bar-group:nth-child(6) .chart-bar {
+  animation-delay: 0.3s;
+}
+.chart-bar-group:nth-child(7) .chart-bar {
+  animation-delay: 0.35s;
+}
+
+/* Boost Card */
+.dashboard__boost {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 300px;
+}
+
+.dashboard__boost-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 13, 26, 0) 0%,
+      rgba(8, 13, 26, 0.85) 50%,
+      rgba(8, 13, 26, 0.98) 100%
+    ),
+    linear-gradient(135deg, #1a2540, #0f1629);
+  z-index: 0;
+}
+
+.dashboard__boost-content {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard__boost-title {
+  font-size: var(--font-xl);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-2);
+}
+
+.dashboard__boost-subtitle {
+  font-size: var(--font-sm);
+  color: var(--color-success);
+  font-weight: 500;
+  margin-bottom: var(--space-5);
+}
+
+.dashboard__boost-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.dashboard__boost-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+  display: block;
+}
+
+.dashboard__boost-text {
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* Bookings Table */
+.dashboard__bookings {
+  overflow: hidden;
+}
+
+.dashboard__bookings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.dashboard__view-all {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--accent-primary);
+  transition: color var(--transition-fast);
+}
+
+.dashboard__view-all:hover {
+  color: var(--accent-primary-hover);
+}
+
+/* Booking User Cell */
+.booking-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.booking-user__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.booking-user__name {
+  font-weight: 600;
+  font-size: var(--font-base);
+}
+
+.booking-user__role {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+}
+
+.booking-amount {
+  font-weight: 700;
+}
+
+/* Empty State */
+.dashboard__empty {
+  text-align: center;
+  padding: var(--space-12) var(--space-8);
+  color: var(--text-secondary);
+}
+
+.dashboard__empty-icon {
+  font-size: 2.5rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+/* ── Player Explore Section ── */
+.dashboard__player-explore {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Sport Filter Bar ── */
+.sport-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.sport-filter-bar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.sport-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.5rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-base);
+}
+
+.sport-filter-chip__emoji {
+  font-size: 1.1em;
+}
+
+.sport-filter-chip:hover {
+  background: var(--bg-secondary);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.sport-filter-chip--active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(232, 97, 45, 0.3);
+}
+
+.sport-filter-chip--active:hover {
+  background: var(--accent-primary-hover);
+  color: #fff;
+  border-color: var(--accent-primary-hover);
+}
+
+/* ── Arena Grid: 2–4 columns ── */
+.dashboard__arena-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-5);
+}
+
+/* ── Player Arena Card ── */
+.player-arena-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-base);
+  animation: fadeInUp 0.5s ease backwards;
+  cursor: pointer;
+}
+
+.player-arena-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-glow), var(--shadow-lg);
+}
+
+/* Image */
+.player-arena-card__image {
+  position: relative;
+  height: 175px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.player-arena-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.player-arena-card:hover .player-arena-card__image img {
+  transform: scale(1.07);
+}
+
+/* Status badge — top-right */
+.player-arena-card__status {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+}
+
+/* Sport pills — bottom-left of image */
+.player-arena-card__sports-overlay {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  z-index: 2;
+}
+
+.player-arena-card__sport-pill {
+  padding: 0.2rem 0.55rem;
+  background: rgba(8, 13, 26, 0.75);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255,255,255,0.12);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.player-arena-card__sport-more {
+  background: rgba(232, 97, 45, 0.7);
+  border-color: rgba(232, 97, 45, 0.5);
+}
+
+/* Gradient scrim at bottom of image */
+.player-arena-card__image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(17,24,39,0.7) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Body */
+.player-arena-card__body {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.player-arena-card__title {
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-arena-card__location {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-arena-card__location svg {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  color: var(--accent-primary);
+}
+
+/* Sports tag row in body */
+.player-arena-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.player-arena-card__tag {
+  padding: 0.18rem 0.55rem;
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.player-arena-card__tag--more {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.player-arena-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-primary);
+}
+
+.player-arena-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.player-arena-card__price-amount {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  color: var(--accent-primary);
+}
+
+.player-arena-card__price-unit {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__header {
+    flex-direction: column;
+  }
+
+  .dashboard__actions {
+    width: 100%;
+  }
+
+  .dashboard__actions .btn {
+    flex: 1;
+  }
+}
+
+/* ── Report Preview ── */
+.report-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: calc(100vh - 120px);
+}
+
+.report-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.report-preview-title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+}
+
+.report-preview-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.report-preview-frame {
+  flex: 1;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  width: 100%;
+}
+

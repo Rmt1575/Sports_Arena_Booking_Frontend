@@ -1,0 +1,337 @@
+/* ── Arenas Page ── */
+.arenas-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.arenas-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.arenas-page__title {
+  font-size: var(--font-4xl);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.arenas-page__subtitle {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* Filters */
+.arenas-filters {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.arenas-filters__search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.arenas-filters__search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  z-index: 1;
+}
+
+.arenas-filters .form-select {
+  min-width: 160px;
+}
+
+/* Grid */
+.arenas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-5);
+}
+
+/* Arena Card */
+.arena-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  animation: fadeInUp 0.5s ease backwards;
+  cursor: pointer;
+}
+
+.arena-card:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow), var(--shadow-lg);
+}
+
+.arena-card__image {
+  position: relative;
+  height: 180px;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.arena-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.arena-card:hover .arena-card__image img {
+  transform: scale(1.05);
+}
+
+.arena-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: linear-gradient(135deg, #0f1629, #1a2540);
+}
+
+.arena-card__overlay {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+/* Edit button overlay — visible on hover for managers */
+.arena-card__edit-overlay {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all var(--transition-base);
+}
+
+.arena-card:hover .arena-card__edit-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.arena-card__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.35rem 0.75rem;
+  background: rgba(232, 97, 45, 0.92);
+  color: #fff;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(232, 97, 45, 0.4);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.arena-card__edit-btn:hover {
+  background: var(--accent-primary-hover);
+  box-shadow: 0 0 12px rgba(232, 97, 45, 0.5);
+  transform: scale(1.04);
+}
+
+.arena-card__view-btn {
+  font-size: var(--font-xs) !important;
+  padding: 0.3rem 0.6rem !important;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+}
+
+.arena-card__view-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.arena-card__body {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.arena-card__name {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.arena-card__location {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.arena-card__sports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.arena-card__sport-tag {
+  padding: 0.2rem 0.5rem;
+  background: var(--accent-primary-light);
+  color: var(--accent-primary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.arena-card__sport-more {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.arena-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-primary);
+  margin-top: var(--space-1);
+}
+
+.arena-card__price {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.arena-card__price small {
+  font-size: var(--font-xs);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.arena-card__capacity {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.arenas-empty {
+  text-align: center;
+  padding: var(--space-16);
+}
+
+/* ── Arena Form: Sport Chips ── */
+.arena-form__sports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.arena-form__sports::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sport-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.4rem 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sport-chip:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--accent-primary-light);
+  transform: translateY(-1px);
+}
+
+.sport-chip--active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 0 10px var(--accent-primary-glow);
+}
+
+.sport-chip--active:hover {
+  background: var(--accent-primary-hover);
+  border-color: var(--accent-primary-hover);
+  color: #fff;
+}
+
+.sport-chip__icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.sports-selected-count {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: var(--font-xs);
+  margin-left: var(--space-1);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Arena Form Card ── */
+.arena-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .arenas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .arenas-filters {
+    flex-direction: column;
+  }
+}
