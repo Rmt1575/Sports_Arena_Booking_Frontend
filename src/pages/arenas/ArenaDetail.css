@@ -276,9 +276,9 @@
   margin-bottom: 2.5rem;
 }
 .k-slots-scroll {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .k-slot-btn {
   background: var(--k-bg-card);
@@ -557,4 +557,70 @@
   .k-main-title { font-size: 2.25rem; }
   .k-features-row { grid-template-columns: 1fr; }
   .k-gallery-main { height: 300px; }
+}
+
+/* -- Gallery Modal -- */
+.k-gallery-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(11, 14, 20, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 5%;
+  overflow-y: auto;
+}
+
+.k-gallery-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--k-border);
+}
+
+.k-gallery-modal-title {
+  font-family: var(--k-font-heading);
+  font-size: 2rem;
+  color: white;
+  margin: 0;
+}
+
+.k-gallery-modal-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.k-gallery-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.k-gallery-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.k-gallery-modal-grid img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--k-border);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.k-gallery-modal-grid img:hover {
+  transform: scale(1.03);
 }

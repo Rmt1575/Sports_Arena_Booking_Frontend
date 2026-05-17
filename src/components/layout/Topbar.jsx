@@ -21,14 +21,7 @@ const Topbar = ({ onMenuToggle }) => {
       </div>
 
       <div className="topbar__center">
-        <div className="topbar__search">
-          <HiOutlineSearch className="topbar__search-icon" />
-          <input
-            type="text"
-            placeholder="Search Arenas..."
-            className="topbar__search-input"
-          />
-        </div>
+        {/* Search removed as per request */}
       </div>
 
       <div className="topbar__right">

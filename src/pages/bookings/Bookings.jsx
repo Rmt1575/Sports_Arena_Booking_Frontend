@@ -17,6 +17,7 @@ const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     fetchBookings();
@@ -117,6 +118,22 @@ const Bookings = () => {
       Cancelled: "badge-error",
     })[s] || "badge-info";
 
+  const format12HourTime = (timeString) => {
+    if (!timeString) return "";
+    const [hourStr, minute] = timeString.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12;
+    hour = hour ? hour : 12; // 0 becomes 12
+    const hourFormatted = hour < 10 ? "0" + hour : hour;
+    return `${hourFormatted}:${minute} ${ampm}`;
+  };
+
+  const renderSlotTime = (slot, fallback = "N/A") => {
+    if (!slot || !slot.start_time || !slot.end_time) return fallback;
+    return `${format12HourTime(slot.start_time)} - ${format12HourTime(slot.end_time)}`;
+  };
+
   if (loading) return <LoadingSpinner text="Loading bookings..." />;
 
   return (
@@ -163,7 +180,7 @@ const Bookings = () => {
             </thead>
             <tbody>
               {filteredBookings.map((b) => (
-                <tr key={b._id}>
+                <tr key={b._id} onClick={() => setSelectedBooking(b)} style={{ cursor: 'pointer' }} className="booking-row-hover">
                   {(isAdmin || isManager) && (
                     <td>
                       <div className="booking-user">
@@ -185,9 +202,7 @@ const Bookings = () => {
                     {b.arena_id?.arena_name || "N/A"}
                   </td>
                   <td>
-                    {b.slot_id
-                      ? `${b.slot_id.start_time}-${b.slot_id.end_time}`
-                      : "—"}
+                    {renderSlotTime(b.slot_id, "—")}
                   </td>
                   <td>
                     <span className="badge badge-accent">{b.booking_type}</span>
@@ -217,18 +232,14 @@ const Bookings = () => {
                             <button
                               className="btn btn-success btn-sm"
                               title="Approve"
-                              onClick={() =>
-                                handleStatusUpdate(b._id, "Confirmed")
-                              }
+                              onClick={(e) => { e.stopPropagation(); handleStatusUpdate(b._id, "Confirmed"); }}
                             >
                               <HiOutlineCheck />
                             </button>
                             <button
                               className="btn btn-danger btn-sm"
                               title="Reject"
-                              onClick={() =>
-                                handleStatusUpdate(b._id, "Rejected")
-                              }
+                              onClick={(e) => { e.stopPropagation(); handleStatusUpdate(b._id, "Rejected"); }}
                             >
                               <HiOutlineX />
                             </button>
@@ -239,7 +250,7 @@ const Bookings = () => {
                         b.payment_status === "Pending" && (
                           <button
                             className="btn btn-primary btn-sm"
-                            onClick={() => handlePayment(b)}
+                            onClick={(e) => { e.stopPropagation(); handlePayment(b); }}
                           >
                             <HiOutlineCurrencyDollar /> Pay
                           </button>
@@ -249,7 +260,7 @@ const Bookings = () => {
                           b.booking_status === "Confirmed") && (
                           <button
                             className="btn btn-ghost btn-sm text-error"
-                            onClick={() => handleCancel(b._id)}
+                            onClick={(e) => { e.stopPropagation(); handleCancel(b._id); }}
                           >
                             Cancel
                           </button>
@@ -269,6 +280,106 @@ const Bookings = () => {
           <p className="text-muted" style={{ marginTop: "var(--space-3)" }}>
             No bookings found
           </p>
+        </div>
+      )}
+
+      {/* Booking Details Modal */}
+      {selectedBooking && (
+        <div className="modal-overlay" onClick={() => setSelectedBooking(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <HiOutlineTicket className="text-accent" /> Booking Details
+              </h2>
+              <button className="btn-icon" onClick={() => setSelectedBooking(null)}>
+                <HiOutlineX />
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Booking ID</span> 
+                <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>{selectedBooking._id}</span>
+              </div>
+              
+              { (isAdmin || isManager) && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Player Name</span> 
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{selectedBooking.user_id?.name || 'Unknown'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Player Email</span> 
+                    <span style={{ color: 'var(--text-primary)' }}>{selectedBooking.user_id?.email || 'N/A'}</span>
+                  </div>
+                </>
+              )}
+              
+              <div style={{ height: '1px', background: 'var(--border-primary)', margin: '0.25rem 0' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Arena</span> 
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '1.1rem' }}>{selectedBooking.arena_id?.arena_name || 'N/A'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Location</span> 
+                <span style={{ textAlign: 'right', color: 'var(--text-primary)', maxWidth: '70%' }}>{selectedBooking.arena_id?.location || 'N/A'}</span>
+              </div>
+              
+              <div style={{ height: '1px', background: 'var(--border-primary)', margin: '0.25rem 0' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Date</span> 
+                <span style={{ color: 'var(--text-primary)' }}>{new Date(selectedBooking.booking_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Time Slot</span> 
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{renderSlotTime(selectedBooking.slot_id)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Type & Duration</span> 
+                <span style={{ color: 'var(--text-primary)' }}>
+                  <span className="badge badge-accent" style={{ marginRight: '0.5rem' }}>{selectedBooking.booking_type}</span> x {selectedBooking.duration}
+                </span>
+              </div>
+              
+              <div style={{ height: '1px', background: 'var(--border-primary)', margin: '0.25rem 0' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Amount</span> 
+                <span style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{selectedBooking.total_amount?.toLocaleString()}</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Payment Status</span> 
+                <span className={`badge ${selectedBooking.payment_status === "Paid" ? "badge-success" : selectedBooking.payment_status === "Pending" ? "badge-pending" : "badge-error"}`}>
+                  {selectedBooking.payment_status}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Booking Status</span> 
+                <span className={`badge ${getStatusBadge(selectedBooking.booking_status)}`}>
+                  {selectedBooking.booking_status}
+                </span>
+              </div>
+
+              {selectedBooking.trainer_id && (
+                <>
+                  <div style={{ height: '1px', background: 'var(--border-primary)', margin: '0.25rem 0' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Trainer</span> 
+                    <span style={{ color: 'var(--text-primary)' }}>{selectedBooking.trainer_id?.name || 'Assigned'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Trainer Status</span> 
+                    <span className={`badge ${selectedBooking.trainer_status === "Approved" ? "badge-success" : selectedBooking.trainer_status === "Rejected" ? "badge-error" : "badge-pending"}`}>
+                      {selectedBooking.trainer_status}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

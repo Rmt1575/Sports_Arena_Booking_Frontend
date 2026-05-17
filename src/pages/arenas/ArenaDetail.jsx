@@ -26,6 +26,7 @@ const ArenaDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
   
   // Trainer Logic
   const [trainers, setTrainers] = useState([]);
@@ -113,6 +114,19 @@ const ArenaDetail = () => {
     return `${days} days ago`;
   };
 
+  // Group slots by date
+  const groupedSlots = slots.reduce((acc, slot) => {
+    const dateStr = slot.date ? new Date(slot.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown Date';
+    if (!acc[dateStr]) {
+      acc[dateStr] = [];
+    }
+    acc[dateStr].push(slot);
+    return acc;
+  }, {});
+
+  // Sort dates
+  const sortedDates = Object.keys(groupedSlots).sort((a, b) => new Date(a) - new Date(b));
+
   return (
     <div className="arena-detail-page">
       <button className="arena-back-btn" onClick={() => navigate(-1)}>
@@ -143,7 +157,7 @@ const ArenaDetail = () => {
         </div>
         <div className="k-gallery-sub">
           <img src={safeSubImg2} alt="Night lighting" />
-          <button className="view-all-btn">View All Photos</button>
+          <button className="view-all-btn" onClick={() => setShowGalleryModal(true)}>View All Photos</button>
         </div>
       </div>
 
@@ -180,21 +194,30 @@ const ArenaDetail = () => {
           <div className="k-slots-section">
             <h2 className="k-section-heading">AVAILABLE SLOTS</h2>
             <div className="k-slots-scroll">
-              {slots.map(slot => {
-                const isSelected = selectedSlot?._id === slot._id;
-                const isAvail = slot.availability === 'Available';
-                return (
-                  <button 
-                    key={slot._id}
-                    disabled={!isAvail}
-                    onClick={() => setSelectedSlot(slot)}
-                    className={`k-slot-btn ${isSelected ? 'k-slot-btn--selected' : ''} ${!isAvail ? 'k-slot-btn--unavailable' : ''}`}
-                  >
-                    <span className="k-slot-time">{slot.start_time} - {slot.end_time}</span>
-                    <span className="k-slot-price">{isAvail ? `₹${slot.price || arena?.price_per_hour || 55}` : slot.availability}</span>
-                  </button>
-                )
-              })}
+              {sortedDates.map(dateStr => (
+                <div key={dateStr} className="k-slot-date-group" style={{ marginBottom: '1.5rem' }}>
+                  <h3 style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <HiOutlineCalendar /> {dateStr}
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                    {groupedSlots[dateStr].map(slot => {
+                      const isSelected = selectedSlot?._id === slot._id;
+                      const isAvail = slot.availability === 'Available';
+                      return (
+                        <button 
+                          key={slot._id}
+                          disabled={!isAvail}
+                          onClick={() => setSelectedSlot(slot)}
+                          className={`k-slot-btn ${isSelected ? 'k-slot-btn--selected' : ''} ${!isAvail ? 'k-slot-btn--unavailable' : ''}`}
+                        >
+                          <span className="k-slot-time">{slot.start_time} - {slot.end_time}</span>
+                          <span className="k-slot-price">{isAvail ? `₹${slot.price || arena?.price_per_hour || 55}` : slot.availability}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
               {slots.length === 0 && (
                 <div style={{color: 'var(--k-text-muted)', fontSize: '0.85rem'}}>No slots generated for this arena today.</div>
               )}
@@ -262,7 +285,7 @@ const ArenaDetail = () => {
               <div className="k-res-slot-box">
                 <HiOutlineCalendar className="k-res-slot-icon" />
                 <div>
-                  <div className="k-res-slot-date">Today's Session</div>
+                  <div className="k-res-slot-date">{selectedSlot ? new Date(selectedSlot.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : "Select a slot"}</div>
                   <div className="k-res-slot-time">
                     {selectedSlot ? `${selectedSlot.start_time} - ${selectedSlot.end_time}` : 'Please select a slot'}
                   </div>
@@ -341,6 +364,20 @@ const ArenaDetail = () => {
         </div>
 
       </div>
+
+      {showGalleryModal && (
+        <div className="k-gallery-modal-overlay">
+          <div className="k-gallery-modal-header">
+            <h2 className="k-gallery-modal-title">{arena.arena_name || 'Arena'} Gallery</h2>
+            <button className="k-gallery-modal-close" onClick={() => setShowGalleryModal(false)}>Close</button>
+          </div>
+          <div className="k-gallery-modal-grid">
+            {images.map((img, idx) => (
+              <img key={idx} src={img} alt={`Arena photo ${idx + 1}`} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
