@@ -156,6 +156,14 @@
   color: var(--text-primary);
   white-space: nowrap;
   transform: translateY(-100%);
+  opacity: 0;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.chart-bar-label--highlight,
+.chart-bar-wrapper:hover .chart-bar-label {
+  opacity: 1;
+  transform: translateY(-120%);
 }
 
 .chart-bar-day {

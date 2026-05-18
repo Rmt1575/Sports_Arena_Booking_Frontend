@@ -10,6 +10,7 @@ const Members = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState(null); // null, 'asc', or 'desc'
 
   useEffect(() => { fetchUsers(); }, []);
 
@@ -43,6 +44,27 @@ const Members = () => {
     const matchRole = !roleFilter || u.role === roleFilter;
     return matchSearch && matchRole;
   });
+
+  const roleWeights = {
+    'Admin': 1,
+    'Arena Manager': 2,
+    'Trainer': 3,
+    'Player': 4
+  };
+
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    if (!sortOrder) return new Date(b.createdAt) - new Date(a.createdAt); // Default sort by newest
+
+    const weightA = roleWeights[a.role] || 99;
+    const weightB = roleWeights[b.role] || 99;
+
+    if (sortOrder === 'asc') return weightA - weightB;
+    return weightB - weightA;
+  });
+
+  const handleSortRole = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
 
   const getRoleBadge = (r) => ({ Admin: 'badge-error', 'Arena Manager': 'badge-info', Trainer: 'badge-warning', Player: 'badge-success' }[r] || 'badge-info');
   const getStatusBadge = (s) => ({ Active: 'badge-success', Pending: 'badge-pending', Inactive: 'badge-error' }[s] || 'badge-info');
@@ -87,7 +109,9 @@ const Members = () => {
           <thead>
             <tr>
               <th>User</th>
-              <th>Role</th>
+              <th onClick={handleSortRole} style={{ cursor: 'pointer', userSelect: 'none' }} title="Click to sort by Role">
+                Role {sortOrder === 'asc' ? '↑' : sortOrder === 'desc' ? '↓' : ''}
+              </th>
               <th>Phone</th>
               <th>Status</th>
               <th>Joined</th>
@@ -95,7 +119,7 @@ const Members = () => {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(u => (
+            {sortedFiltered.map(u => (
               <tr key={u._id}>
                 <td>
                   <div className="booking-user">

@@ -25,6 +25,8 @@ const Dashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [allArenas, setAllArenas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allBookings, setAllBookings] = useState([]);
+  const [chartFilter, setChartFilter] = useState('Daily');
   const [selectedSport, setSelectedSport] = useState('');
   
   const [showReportPreview, setShowReportPreview] = useState(false);
@@ -33,6 +35,17 @@ const Dashboard = () => {
   const [reportStartDate, setReportStartDate] = useState('');
   const [reportEndDate, setReportEndDate] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Helpers for Chart and Stats
+  const getBookingDate = (b) => {
+    if (b.slot_id && b.slot_id.date) return new Date(b.slot_id.date);
+    return new Date(b.createdAt || b.booking_date);
+  };
+
+  const getBookingRevenue = (b) => {
+    if (isTrainer) return (b.duration || 1) * (user?.fee_per_session || 0);
+    return b.total_amount || 0;
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -64,6 +77,7 @@ const Dashboard = () => {
       const arenaData = results[1]?.status === 'fulfilled' ? results[1].value.data.data : [];
       const userData = (userIndex !== -1 && results[userIndex]?.status === 'fulfilled') ? results[userIndex].value.data.data : [];
 
+      setAllBookings(bookingData || []);
       setBookings(bookingData?.slice(0, 5) || []);
       setAllArenas(arenaData || []);
 
@@ -82,7 +96,11 @@ const Dashboard = () => {
       } else {
         const totalBookings = bookingData?.length || 0;
         const confirmedBookings = bookingData?.filter(b => b.booking_status === 'Confirmed').length || 0;
-        const totalRevenue = bookingData?.filter(b => b.booking_status === 'Confirmed').reduce((sum, b) => sum + (b.total_amount || 0), 0) || 0;
+        const totalRevenue = bookingData?.filter(b => b.booking_status === 'Confirmed').reduce((sum, b) => {
+          let rev = b.total_amount || 0;
+          if (isTrainer) rev = (b.duration || 1) * (user?.fee_per_session || 0);
+          return sum + rev;
+        }, 0) || 0;
         const totalArenas = arenaData?.length || 0;
         
         let activeMembers = confirmedBookings;
@@ -125,19 +143,20 @@ const Dashboard = () => {
     setIsGenerating(true);
     
     try {
-      let endpoint = isAdmin || isManager ? '/bookings' : '/bookings/my';
-      const res = await API.get(endpoint, {
-        params: {
-          startDate: reportStartDate,
-          endDate: reportEndDate
-        }
+      const start = new Date(reportStartDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(reportEndDate);
+      end.setHours(23, 59, 59, 999);
+
+      const reportBookings = allBookings.filter(b => {
+        const bd = getBookingDate(b);
+        return bd >= start && bd <= end;
       });
-      const reportBookings = res.data.data || [];
 
       // Calculate stats for the report
       let reportStats = {
         totalBookings: reportBookings.length,
-        totalRevenue: reportBookings.filter(b => b.booking_status === 'Confirmed').reduce((sum, b) => sum + (b.total_amount || 0), 0),
+        totalRevenue: reportBookings.filter(b => b.booking_status === 'Confirmed').reduce((sum, b) => sum + getBookingRevenue(b), 0),
         confirmedBookings: reportBookings.filter(b => b.booking_status === 'Confirmed').length
       };
 
@@ -187,10 +206,11 @@ const Dashboard = () => {
       doc.text("Bookings Log", 14, currentY);
       currentY += 8;
       
-      const tableColumn = [isAdmin || isManager ? "Player / Team" : "Arena", "Venue", "Time Slot", "Amount", "Status"];
+      const tableColumn = ["Date", isAdmin || isManager ? "Player / Team" : "Arena", "Venue", "Time Slot", "Amount", "Status"];
       const tableRows = [];
       
       reportBookings.forEach(booking => {
+          const date = getBookingDate(booking).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
           const playerName = isAdmin || isManager 
               ? (booking.user_id?.name || 'Unknown') 
               : (booking.arena_id?.arena_name || 'Arena');
@@ -198,18 +218,37 @@ const Dashboard = () => {
           const timeSlot = booking.slot_id 
                            ? `${booking.slot_id.start_time} - ${booking.slot_id.end_time}` 
                            : `${booking.duration || 1} ${booking.booking_type || 'Session'}(s)`;
-          const amount = `Rs. ${booking.total_amount || 0}`;
+          const amount = `Rs. ${getBookingRevenue(booking).toLocaleString()}`;
           const status = booking.booking_status || 'N/A';
           
-          tableRows.push([playerName, venue, timeSlot, amount, status]);
+          tableRows.push([date, playerName, venue, timeSlot, amount, status]);
       });
       
       autoTable(doc, {
           head: [tableColumn],
           body: tableRows,
           startY: currentY,
-          styles: { fontSize: 10, cellPadding: 3 },
-          headStyles: { fillColor: [232, 97, 45] }
+          theme: 'grid',
+          styles: { 
+            fontSize: 10, 
+            cellPadding: 5,
+            textColor: [60, 60, 60],
+            font: 'helvetica'
+          },
+          headStyles: { 
+            fillColor: [232, 97, 45], 
+            textColor: [255, 255, 255], 
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          columnStyles: {
+            0: { fontStyle: 'bold', textColor: [40, 40, 40] }, // Date
+            4: { halign: 'right', fontStyle: 'bold', textColor: [40, 150, 80] }, // Amount
+            5: { halign: 'center' } // Status
+          },
+          alternateRowStyles: {
+            fillColor: [248, 249, 250]
+          }
       });
       
       const pdfBlobUrl = doc.output('bloburl');
@@ -325,6 +364,64 @@ const Dashboard = () => {
   const displayedArenas = allArenas
     .filter(a => !selectedSport || a.sport_type?.includes(selectedSport))
     .slice(0, 6);
+
+  // Chart Logic
+  const getChartData = () => {
+    const confirmedBookings = allBookings.filter(b => b.booking_status === 'Confirmed');
+    const now = new Date();
+    
+    if (chartFilter === 'Daily') {
+      const days = [];
+      const data = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        days.push(d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase());
+        
+        const sum = confirmedBookings.filter(b => {
+          const bd = getBookingDate(b);
+          return bd.getDate() === d.getDate() && bd.getMonth() === d.getMonth() && bd.getFullYear() === d.getFullYear();
+        }).reduce((acc, b) => acc + getBookingRevenue(b), 0);
+        
+        data.push(sum);
+      }
+      return { labels: days, data };
+    } else if (chartFilter === 'Weekly') {
+      const labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      const data = [0, 0, 0, 0];
+      for (let i = 0; i < 4; i++) {
+        const endDay = new Date(now);
+        endDay.setDate(endDay.getDate() - (i * 7));
+        const startDay = new Date(now);
+        startDay.setDate(startDay.getDate() - ((i + 1) * 7));
+        
+        data[3 - i] = confirmedBookings.filter(b => {
+          const bd = getBookingDate(b);
+          return bd > startDay && bd <= endDay;
+        }).reduce((acc, b) => acc + getBookingRevenue(b), 0);
+      }
+      return { labels, data };
+    } else if (chartFilter === 'Monthly') {
+      const labels = [];
+      const data = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        labels.push(d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase());
+        
+        const sum = confirmedBookings.filter(b => {
+          const bd = getBookingDate(b);
+          return bd.getMonth() === d.getMonth() && bd.getFullYear() === d.getFullYear();
+        }).reduce((acc, b) => acc + getBookingRevenue(b), 0);
+        data.push(sum);
+      }
+      return { labels, data };
+    }
+    return { labels: [], data: [] };
+  };
+
+  const chartInfo = getChartData();
+  const maxRevenue = Math.max(...chartInfo.data, 1);
+  const chartHeights = chartInfo.data.map(val => Math.max((val / maxRevenue) * 100, 5));
 
   return (
     <div className="dashboard">
@@ -537,28 +634,38 @@ const Dashboard = () => {
             <div className="dashboard__chart-header">
               <h2 className="dashboard__section-title">REVENUE PERFORMANCE</h2>
               <div className="dashboard__chart-tabs">
-                <button className="dashboard__chart-tab dashboard__chart-tab--active">Weekly</button>
-                <button className="dashboard__chart-tab">Monthly</button>
+                <button 
+                  className={`dashboard__chart-tab ${chartFilter === 'Daily' ? 'dashboard__chart-tab--active' : ''}`}
+                  onClick={() => setChartFilter('Daily')}
+                >Daily</button>
+                <button 
+                  className={`dashboard__chart-tab ${chartFilter === 'Weekly' ? 'dashboard__chart-tab--active' : ''}`}
+                  onClick={() => setChartFilter('Weekly')}
+                >Weekly</button>
+                <button 
+                  className={`dashboard__chart-tab ${chartFilter === 'Monthly' ? 'dashboard__chart-tab--active' : ''}`}
+                  onClick={() => setChartFilter('Monthly')}
+                >Monthly</button>
               </div>
             </div>
             <div className="dashboard__chart-body">
-              {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => {
-                const heights = [55, 65, 60, 85, 50, 45, 40];
-                const isHighlight = i === 3;
+              {chartInfo.labels.map((label, i) => {
+                const height = chartHeights[i];
+                const value = chartInfo.data[i];
+                const isHighlight = value === Math.max(...chartInfo.data) && value > 0;
                 return (
-                  <div key={day} className="chart-bar-group">
+                  <div key={label + i} className="chart-bar-group">
                     <div className="chart-bar-wrapper">
-                      {isHighlight && (
-                        <div className="chart-bar-label">
-                          ₹{((stats?.totalRevenue || 24000) / 7).toFixed(0)}
-                        </div>
-                      )}
+                      <div className={`chart-bar-label ${isHighlight ? 'chart-bar-label--highlight' : ''}`}>
+                        ₹{value.toLocaleString()}
+                      </div>
                       <div
                         className={`chart-bar ${isHighlight ? 'chart-bar--highlight' : ''}`}
-                        style={{ height: `${heights[i]}%` }}
+                        style={{ height: `${height}%` }}
+                        title={`₹${value.toLocaleString()}`}
                       />
                     </div>
-                    <span className="chart-bar-day">{day}</span>
+                    <span className="chart-bar-day">{label}</span>
                   </div>
                 );
               })}
