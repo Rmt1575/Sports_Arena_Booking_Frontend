@@ -37,8 +37,8 @@ const Bookings = () => {
 
   const handleStatusUpdate = async (bookingId, status) => {
     try {
-      await API.put(`/bookings/status/${bookingId}`, { status });
-      toast.success(`Booking ${status.toLowerCase()}`);
+      const res = await API.put(`/bookings/status/${bookingId}`, { status });
+      toast.success(res.data.message || `Booking ${status.toLowerCase()}`);
       fetchBookings();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed");
@@ -212,7 +212,7 @@ const Bookings = () => {
                   </td>
                   <td>
                     <span
-                      className={`badge ${b.payment_status === "Paid" ? "badge-success" : b.payment_status === "Pending" ? "badge-pending" : "badge-error"}`}
+                      className={`badge ${b.payment_status === "Paid" ? "badge-success" : b.payment_status === "Pending" ? "badge-pending" : b.payment_status === "Refund in process" ? "badge-warning" : "badge-error"}`}
                     >
                       {b.payment_status}
                     </span>
@@ -352,7 +352,7 @@ const Bookings = () => {
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
                 <span style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Payment Status</span> 
-                <span className={`badge ${selectedBooking.payment_status === "Paid" ? "badge-success" : selectedBooking.payment_status === "Pending" ? "badge-pending" : "badge-error"}`}>
+                <span className={`badge ${selectedBooking.payment_status === "Paid" ? "badge-success" : selectedBooking.payment_status === "Pending" ? "badge-pending" : selectedBooking.payment_status === "Refund in process" ? "badge-warning" : "badge-error"}`}>
                   {selectedBooking.payment_status}
                 </span>
               </div>
