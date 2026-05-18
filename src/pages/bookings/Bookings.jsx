@@ -51,7 +51,7 @@ const Bookings = () => {
       await API.put(`/bookings/cancel/${bookingId}`, {
         reason: "User cancelled",
       });
-      toast.success("Booking cancelled");
+      toast.success("Booking cancelled. Refund in process");
       fetchBookings();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed");
